@@ -10,49 +10,49 @@ unsigned long temps_de_fonctionnement_actuelle=0; //permet de stocker le temps d
 unsigned long temps_cycle_de_fonctionnement_actuelle=0; //permet de stocker le temps actuelle du cycle (1 cycle c'est 4min)
 
 int flag_indique_possition_verin=0; //cette variable prendra 0 si le verin n'est pas sorti est prendra 1 si le verin est sorti
-int flag_premier_tour=0; //cette variable vas permettre de traiter le cas ou notre système viens de demarrer, cette variable prendra 0 si le programme vient demarrer et prendra la valeur 1 si le programme à déjà tourné
+int flag_premier_tour=0; //cette variable permettra de traiter le cas ou notre système viens de démarrer, cette variable prendra 0 si le programme vient de démarrer et prendra la valeur 1 si le programme à déjà tourné
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(VITESSE_DU_VERIN, OUTPUT); //declare le port 11 comme une sortie
-  pinMode(SENS_DU_VERIN, OUTPUT); //declare le port 12 comme une sortie 
+  pinMode(VITESSE_DU_VERIN, OUTPUT); //déclare le port 11 comme une sortie
+  pinMode(SENS_DU_VERIN, OUTPUT); //déclare le port 12 comme une sortie 
   analogWrite(VITESSE_DU_VERIN,0); //a l'initialisation la vitesse est de 0
 }
 
 void loop()
 {
-  if( ((millis() - temps_cycle_de_fonctionnement_actuelle) >= CYCLE_DE_FOCNTIONNEMNT) || (flag_premier_tour ==0) ) //si le cycle est superieur a 4min ou que le programme viens de demarer alors on rentre dans le if
+  if( ((millis() - temps_cycle_de_fonctionnement_actuelle) >= CYCLE_DE_FOCNTIONNEMNT) || (flag_premier_tour ==0) ) //si le cycle est supérieur a 4min ou que le programme viens de démarrer alors on rentre dans le if
   {
-    while( (millis() + temps_de_fonctionnement_actuelle) < TEMPS_DE_FONCTIONNEMENT_MAX ) //tant que le verin n'a pas fonctionné 1min consécutive on le fait fonctionner
+    while( (millis() + temps_de_fonctionnement_actuelle) < TEMPS_DE_FONCTIONNEMENT_MAX ) //tant que le vérin n'a pas fonctionné pendant 1min on le fait fonctionner
     {
       switch(flag_indique_possition_verin) 
       {
-        case 0: //si le verin n'est pas sorti alors on le fait sortir 
+        case 0: //si le vérin n'est pas sorti alors on le fait sortir 
           lire_valeur();//appel de la fonction lire_valeur
-          while( (valeur_du_can_arduino != 1023) && ((millis() + temps_de_fonctionnement_actuelle) < TEMPS_DE_FONCTIONNEMENT_MAX) ) //1023 correspond a la valeur max du CAN ce qui signifie que tant que le verin n'est pas en fin de course alors on sort le verin et on verifie que le temps de fonctionnement est inferieur à 1min
+          while( (valeur_du_can_arduino != 1023) && ((millis() + temps_de_fonctionnement_actuelle) < TEMPS_DE_FONCTIONNEMENT_MAX) ) //1023 correspond à la valeur max du CAN ce qui signifie que tant que le verin n'est pas en fin de course alors on sort le verin et on vérifie que le temps de fonctionnement est inférieur à 1min
           {
             sortir(); //appel de la fonction sortir
             lire_valeur(); //appel de la fonction lire_valeur
           }
-          analogWrite(VITESSE_DU_VERIN,0); //permet d'arreter le verin 
+          analogWrite(VITESSE_DU_VERIN,0); //permet d'arrêter le verin 
           flag_indique_possition_verin = 1; //le verin est enfin sorti au maximum
         break;
-        case 1: //si le verin est  sorti alors on le fait rentrer 
+        case 1: //si le verin est sorti alors on le fait rentrer 
           lire_valeur();//appel de la fonction lire_valeur
-          while( (valeur_du_can_arduino != 0) && ((millis() + temps_de_fonctionnement_actuelle) < TEMPS_DE_FONCTIONNEMENT_MAX) )//0 correspond a la valeur min du CAN ce qui signifie que tant que le verin n'est pas en rentre entierement alors on rentre le verins et on verifie que le temps de fonctionnement est inferieur à 1min
+          while( (valeur_du_can_arduino != 0) && ((millis() + temps_de_fonctionnement_actuelle) < TEMPS_DE_FONCTIONNEMENT_MAX) )//0 correspond a la valeur min du CAN ce qui signifie que tant que le verin n'est pas en rentré entièrement alors on rentre le vérin et on vérifie que le temps de fonctionnement est inferieur à 1min
           {
             rentrer(); //appel de la fonction rentrer
             lire_valeur(); //appel de la fonction lire_valeur
           }
-          analogWrite(VITESSE_DU_VERIN,0); //permet d'arreter le verin
-          flag_indique_possition_verin = 0; //le verin est enfin rentre au maximum
+          analogWrite(VITESSE_DU_VERIN,0); //permet d'arrêter le vérin
+          flag_indique_possition_verin = 0; //le vérin est enfin rentré au maximum
         break;
       }
-      temps_de_fonctionnement_actuelle=millis(); //recupere le temps actuelle du fonctionnement du verin
+      temps_de_fonctionnement_actuelle=millis(); //récupère le temps actuelle du fonctionnement du verin
     }
     flag_premier_tour=1; //mettre cette variable à 1 comme ça le if testera uniquement si le le cyle des 4 min à était dépassé ou non
-    temps_cycle_de_fonctionnement_actuelle=millis(); //recupere le temps actuelle du cycle de 4min
+    temps_cycle_de_fonctionnement_actuelle=millis(); //récupère le temps actuelle du cycle de 4min
   }
 }
 
